@@ -1,4 +1,7 @@
 package com.vicente.springboothateoas.services;
 
-public class PeopleService {
+import com.vicente.springboothateoas.entities.People;
+import com.vicente.springboothateoas.interfaces.GenericOperations;
+
+public interface PeopleService extends GenericOperations<People> {
 }

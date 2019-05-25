@@ -24,7 +24,7 @@ public class Product extends ResourceSupport {
 	@Id
 	@GeneratedValue (strategy = GenerationType.AUTO)
 	@Column(name="id")
-	private Integer idProduct;
+	private Long idProduct;
 
 	private String name;
 

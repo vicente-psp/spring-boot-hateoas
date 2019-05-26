@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vicente.springboothateoas.entities.Order;
 import com.vicente.springboothateoas.interfaces.GenericOperationsController;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/orders")
@@ -43,7 +45,7 @@ public class OrderController implements GenericOperationsController<Order> {
 						 	 MediaType.APPLICATION_XML_VALUE,
 						 	 MediaTypes.HAL_JSON_VALUE})
 	@ResponseStatus(HttpStatus.CREATED)
-	public Resource<Order> post(@RequestBody Order entity) {
+	public Resource<Order> post(@RequestBody @Valid Order entity) {
 		try {
 			service.post(entity);
 			logger.info("Registro inserido");
@@ -60,7 +62,7 @@ public class OrderController implements GenericOperationsController<Order> {
 	@Override
 	@PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void put(@RequestBody Order entity) {
+	public void put(@RequestBody @Valid Order entity) {
 		try {
 			service.put(entity);
 			logger.info(String.format("Registro atualizado: %s", entity.toString()));
@@ -72,14 +74,13 @@ public class OrderController implements GenericOperationsController<Order> {
 	@Override
 	@DeleteMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@RequestBody Order entities) {
+	public void delete(@RequestBody Order entity) {
 		try {
-			service.delete(entities);
-			logger.info(String.format("Registro(s) deletado(s): %s",entities.toString()));
+			service.delete(entity);
+			logger.info(String.format("Registro(s) deletado(s): %s",entity.toString()));
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s", e.getMessage()));
 		}
-
 	}
 
 	@Override
@@ -88,30 +89,29 @@ public class OrderController implements GenericOperationsController<Order> {
 							 MediaTypes.HAL_JSON_VALUE})
 	@ResponseStatus(HttpStatus.OK)
 	public Resources<Order> get() {
-	 	Resources<Order> result = null;
 		try {
 			List<Order> entities = service.get();
 
 			logger.info(String.format("Registro(s) recuperados(s): %s", entities.toString()));
 
-			for (final Order order : entities) {
+			for (final Order entity : entities) {
 		        Link selfLink = linkTo(OrderController.class)
-		        		.slash(order.getIdOrder())
+		        		.slash(entity.getIdOrder())
 		        		.withSelfRel();
 
 		        Link selfLinkPeople = linkTo(PeopleController.class)
-		        		.slash(order.getPeople().getIdPeople())
+		        		.slash(entity.getPeople().getIdPeople())
 		        		.withSelfRel();
 
-		        order.getPeople().add(selfLinkPeople);
-		        order.add(selfLink);
+				entity.getPeople().add(selfLinkPeople);
+				entity.add(selfLink);
 		    }
 			Link link = linkTo(OrderController.class).withSelfRel();
-			result = new Resources<Order>(entities, link);
+			return new Resources<>(entities, link);
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s", e.getMessage()));
 		}
-		return result;
+		return null;
 	}
 
 	@Override
@@ -122,18 +122,16 @@ public class OrderController implements GenericOperationsController<Order> {
 	 						MediaTypes.HAL_JSON_VALUE})
 	@ResponseStatus(HttpStatus.OK)
 	public Resource<Order> get(@PathVariable("id") Long id) {
-
-		Resource<Order> result = null;
 		try {
 			Order entity = service.get(id);
 			logger.info(String.format("Registro recuperado: %s", entity.toString()));
 
 			Link link = linkTo(OrderController.class).slash(entity.getIdOrder()).withSelfRel();
-			result = new Resource<>(entity, link);
+			return new Resource<>(entity, link);
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s", e.getMessage()));
 		}
-		return result;
+		return null;
 	}
 
 	@Override
@@ -146,7 +144,6 @@ public class OrderController implements GenericOperationsController<Order> {
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PATCH.\nMensagem: %s", e.getMessage()));
 		}
-
 	}
 
 }

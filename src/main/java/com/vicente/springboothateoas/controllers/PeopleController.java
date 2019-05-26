@@ -18,6 +18,7 @@ import com.vicente.springboothateoas.entities.People;
 import com.vicente.springboothateoas.interfaces.GenericOperationsController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -50,16 +51,26 @@ public class PeopleController implements GenericOperationsController<People> {
 	@Override
 	@PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, 
 							 MediaType.APPLICATION_XML_VALUE})
-	@ResponseStatus(HttpStatus.OK)
-	public void put(@RequestBody People people) {
-		logger.info("Atulizado registro de pessoa.");
-		
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void put(@RequestBody @Valid People entity) {
+		try {
+			service.put(entity);
+			logger.info(String.format("Registro atualizado: %s", entity.toString()));
+		} catch (Exception e) {
+			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s", e.getMessage()));
+		}		
 	}
 
 	@Override
+	@DeleteMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(People entity) {
-		// TODO Auto-generated method stub
-		
+		try {
+			service.delete(entity);
+			logger.info(String.format("Registro(s) deletado(s): %s",entity.toString()));
+		} catch (Exception e) {
+			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s", e.getMessage()));
+		}
 	}
 
 	@Override
@@ -69,37 +80,46 @@ public class PeopleController implements GenericOperationsController<People> {
 	@ResponseStatus(HttpStatus.OK)
 	public Resources<People> get() {
 		try {
-			//List<Order> orders = orderService.get();
-			
-			//logger.info(String.format("Registro(s) recuperados(s): %s",orders.toString()));
-			
-//			for (final Order order : orders) {
-//		        Link selfLink = linkTo(methodOn(OrderController.class)
-//		          .getOrderById(customerId, order.getIdOrder()())).withSelfRel();
-//		        order.add(selfLink);
-//		    }
-//		  
-//		    Link link = linkTo(methodOn(CustomerController.class)
-//		      .getOrdersForCustomer(customerId)).withSelfRel();
-//		    Resources<Order> result = new Resources<Order>(orders, link);
-//		    return result;
-			
+			List<People> entities = service.get();
+
+			logger.info(String.format("Registro(s) recuperados(s): %s", entities.toString()));
+
+			for (final People entity : entities) {
+				Link selfLink = linkTo(PeopleController.class)
+								.slash(entity.getIdPeople())
+								.withSelfRel();
+				entity.add(selfLink);
+			}
+			Link link = linkTo(PeopleController.class).withSelfRel();
+			return new Resources<>(entities, link);
 		} catch (Exception e) {
-			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s",e.getMessage()));
+			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s", e.getMessage()));
 		}
 		return null;
 	}
 
 	@Override
 	public Resource<People> get(Long id) {
-		// TODO Auto-generated method stub
+		try {
+			People entity = service.get(id);
+			logger.info(String.format("Registro recuperado: %s", entity.toString()));
+
+			Link link = linkTo(PeopleController.class).slash(entity.getIdPeople()).withSelfRel();
+			return new Resource<>(entity, link);
+		} catch (Exception e) {
+			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s", e.getMessage()));
+		}
 		return null;
 	}
 
 	@Override
 	public void patch(People entity) {
-		// TODO Auto-generated method stub
-		
+		try {
+			service.patch(entity);
+			logger.info(String.format("Registro atualizado: %s",entity.toString()));
+		} catch (Exception e) {
+			logger.error(String.format("Erro ao executar o método PATCH.\nMensagem: %s", e.getMessage()));
+		}
 	}
 
 }

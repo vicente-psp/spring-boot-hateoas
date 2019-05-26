@@ -60,10 +60,10 @@ public class OrderController implements GenericOperationsController<Order> {
 	@Override
 	@PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void put(@RequestBody Order order) {
+	public void put(@RequestBody Order entity) {
 		try {
-			service.put(order);
-			logger.info(String.format("Registro atualizado: %s", order.toString()));
+			service.put(entity);
+			logger.info(String.format("Registro atualizado: %s", entity.toString()));
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s", e.getMessage()));
 		}
@@ -72,12 +72,12 @@ public class OrderController implements GenericOperationsController<Order> {
 	@Override
 	@DeleteMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@RequestBody Order orders) {
+	public void delete(@RequestBody Order entities) {
 		try {
-			service.delete(orders);
-			logger.info(String.format("Registro(s) deletado(s): %s",orders.toString()));
+			service.delete(entities);
+			logger.info(String.format("Registro(s) deletado(s): %s",entities.toString()));
 		} catch (Exception e) {
-			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s",e.getMessage()));
+			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s", e.getMessage()));
 		}
 
 	}
@@ -90,11 +90,11 @@ public class OrderController implements GenericOperationsController<Order> {
 	public Resources<Order> get() {
 	 	Resources<Order> result = null;
 		try {
-			List<Order> orders = service.get();
+			List<Order> entities = service.get();
 
-			logger.info(String.format("Registro(s) recuperados(s): %s",orders.toString()));
+			logger.info(String.format("Registro(s) recuperados(s): %s", entities.toString()));
 
-			for (final Order order : orders) {
+			for (final Order order : entities) {
 		        Link selfLink = linkTo(OrderController.class)
 		        		.slash(order.getIdOrder())
 		        		.withSelfRel();
@@ -107,9 +107,9 @@ public class OrderController implements GenericOperationsController<Order> {
 		        order.add(selfLink);
 		    }
 			Link link = linkTo(OrderController.class).withSelfRel();
-			result = new Resources<Order>(orders, link);
+			result = new Resources<Order>(entities, link);
 		} catch (Exception e) {
-			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s",e.getMessage()));
+			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s", e.getMessage()));
 		}
 		return result;
 	}
@@ -125,34 +125,26 @@ public class OrderController implements GenericOperationsController<Order> {
 
 		Resource<Order> result = null;
 		try {
-			Order order = service.get(id);
-			logger.info(String.format("Registro recuperado: %s",order.toString()));
+			Order entity = service.get(id);
+			logger.info(String.format("Registro recuperado: %s", entity.toString()));
 
-			Link link = linkTo(OrderController.class).slash(order.getIdOrder()).withSelfRel();
-			result = new Resource<>(order, link);
+			Link link = linkTo(OrderController.class).slash(entity.getIdOrder()).withSelfRel();
+			result = new Resource<>(entity, link);
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s", e.getMessage()));
 		}
 		return result;
-
-//		try {
-//			Order order = service.get(id);
-//			logger.info(String.format("Registro recuperado: %s",order.toString()));
-//		} catch (Exception e) {
-//			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s",e.getMessage()));
-//		}
-//		return null;
 	}
 
 	@Override
 	@PatchMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void patch(@RequestBody Order order) {
+	public void patch(@RequestBody Order entity) {
 		try {
-			service.patch(order);
-			logger.info(String.format("Registro atualizado: %s",order.toString()));
+			service.patch(entity);
+			logger.info(String.format("Registro atualizado: %s",entity.toString()));
 		} catch (Exception e) {
-			logger.error(String.format("Erro ao executar o método PATCH.\nMensagem: %s",e.getMessage()));
+			logger.error(String.format("Erro ao executar o método PATCH.\nMensagem: %s", e.getMessage()));
 		}
 
 	}

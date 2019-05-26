@@ -4,6 +4,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.util.List;
 
+import com.vicente.springboothateoas.services.impl.OrderServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicente.springboothateoas.entities.Order;
 import com.vicente.springboothateoas.interfaces.GenericOperationsController;
-import com.vicente.springboothateoas.services.OrderService;
 
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController implements GenericOperationsController<Order> {
-	
-	/**
-	 * @see http://appsdeveloperblog.com/spring-boot-logging-with-loggerfactory/
-	 */
+
 	Logger logger = LoggerFactory.getLogger(OrderController.class);
 	
-	@Autowired
-	public OrderService orderService;
+	@Autowired private OrderServiceImpl service;
 	
 	@Override
 	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, 
@@ -47,18 +43,18 @@ public class OrderController implements GenericOperationsController<Order> {
 						 	 MediaType.APPLICATION_XML_VALUE,
 						 	 MediaTypes.HAL_JSON_VALUE})
 	@ResponseStatus(HttpStatus.CREATED)
-	public Resource<Order> post(@RequestBody Order order) {
-		Resource<Order> result = null;
+	public Resource<Order> post(@RequestBody Order entity) {
 		try {
-			orderService.post(order);
+			service.post(entity);
 			logger.info("Registro inserido");
 
-			Link link = linkTo(OrderController.class).slash(order.getIdOrder()).withSelfRel();
-			result = new Resource<Order>(order, link);
+			Link link = linkTo(OrderController.class).slash(entity.getIdOrder()).withSelfRel();
+			Resource<Order> result = new Resource<Order>(entity, link);
+			return result;
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método POST.\nMensagem: %s", e.getMessage()));
 		}
-		return result;
+		return null;
 	}
 
 	@Override
@@ -66,7 +62,7 @@ public class OrderController implements GenericOperationsController<Order> {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void put(@RequestBody Order order) {
 		try {
-			orderService.put(order);
+			service.put(order);
 			logger.info(String.format("Registro atualizado: %s", order.toString()));
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s", e.getMessage()));
@@ -78,7 +74,7 @@ public class OrderController implements GenericOperationsController<Order> {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@RequestBody Order orders) {
 		try {
-			orderService.delete(orders);
+			service.delete(orders);
 			logger.info(String.format("Registro(s) deletado(s): %s",orders.toString()));
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PUT.\nMensagem: %s",e.getMessage()));
@@ -94,7 +90,7 @@ public class OrderController implements GenericOperationsController<Order> {
 	public Resources<Order> get() {
 	 	Resources<Order> result = null;
 		try {
-			List<Order> orders = orderService.get();
+			List<Order> orders = service.get();
 
 			logger.info(String.format("Registro(s) recuperados(s): %s",orders.toString()));
 
@@ -129,7 +125,7 @@ public class OrderController implements GenericOperationsController<Order> {
 
 		Resource<Order> result = null;
 		try {
-			Order order = orderService.get(id);
+			Order order = service.get(id);
 			logger.info(String.format("Registro recuperado: %s",order.toString()));
 
 			Link link = linkTo(OrderController.class).slash(order.getIdOrder()).withSelfRel();
@@ -140,7 +136,7 @@ public class OrderController implements GenericOperationsController<Order> {
 		return result;
 
 //		try {
-//			Order order = orderService.get(id);
+//			Order order = service.get(id);
 //			logger.info(String.format("Registro recuperado: %s",order.toString()));
 //		} catch (Exception e) {
 //			logger.error(String.format("Erro ao executar o método GET.\nMensagem: %s",e.getMessage()));
@@ -153,7 +149,7 @@ public class OrderController implements GenericOperationsController<Order> {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void patch(@RequestBody Order order) {
 		try {
-			orderService.patch(order);
+			service.patch(order);
 			logger.info(String.format("Registro atualizado: %s",order.toString()));
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PATCH.\nMensagem: %s",e.getMessage()));

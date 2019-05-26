@@ -1,6 +1,7 @@
 package com.vicente.springboothateoas.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -15,58 +16,55 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-	
-	/**
-//	 * @see http://appsdeveloperblog.com/spring-boot-logging-with-loggerfactory/
-	 */
+
 	Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 	
-	@Autowired
-	public OrderRepository orderRepository;
+	@Autowired private OrderRepository repository;
 	
 	@Override
 	@Transactional
-	public Order post(Order order) {
+	public Order post(Order entity) {
 		try {
 			logger.debug("\tMétodo POST executado.");
 			logger.debug("\tMétodo POST invocado");
-			logger.debug(String.format("\tValor recebido: %s",order.toString()));
+			logger.debug(String.format("\tValor recebido: %s", entity.toString()));
 			
-			orderRepository.save(order);
-			
-			logger.info(String.format("\tValor persistido: %s",order.toString()));
-			return order;
+			Order entitySaved = repository.save(entity);
+
+			logger.info(String.format("\tValor persistido: %s", entitySaved.toString()));
+			return entitySaved;
 		} catch (Exception e) {
-			logger.error(String.format("Error ao persistir registro. \nMensagem:%s",e.getMessage()));
+			logger.error(String.format("Error ao persistir registro. \nMensagem:%s", e.getMessage()));
+			return null;
 		}
-		return null;
 	}
 
 	@Override
 	public Order get(Long id) {
 		try {
-			orderRepository.findById(id);
+			Optional<Order> optional = repository.findById(id);
+			return optional.get();
 		} catch (Exception e) {
 			logger.error("Error ao recuperar método GET.");
-		}
-		return null;
-	}
-
-	@Override
-	@Transactional
-	public void put(Order order) {
-		try {
-			orderRepository.getOne(order.getIdOrder());
-		} catch (Exception e) {
-			logger.error("Error ao recuperar método GET.");
+			return null;
 		}
 	}
 
 	@Override
 	@Transactional
-	public void delete(Order order) {
+	public void put(Order entity) {
 		try {
-			orderRepository.delete(order);
+			repository.getOne(entity.getIdOrder());
+		} catch (Exception e) {
+			logger.error("Error ao recuperar método GET.");
+		}
+	}
+
+	@Override
+	@Transactional
+	public void delete(Order entity) {
+		try {
+			repository.delete(entity);
 		} catch (Exception e) {
 			logger.error("Error ao deletar registro.");
 		}
@@ -110,9 +108,9 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<Order> get() {
 		try {
-			return orderRepository.findAll();
+			return repository.findAll();
 		} catch (Exception e) {
-			logger.error("Error ao recuperar registro." +e.getMessage());
+			logger.error("Error ao recuperar registro." + e.getMessage());
 		}
 		return null;
 	}

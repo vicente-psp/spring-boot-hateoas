@@ -25,12 +25,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "tb_people")
+@SequenceGenerator(name = "people_seq", sequenceName = "people_seq", initialValue = 1, allocationSize = 1)
 public class People extends ResourceSupport implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue (strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "people_seq")
 	@Column(name="id")
 	private Long idPeople;
 

@@ -40,7 +40,7 @@ public class PeopleController implements GenericOperationsController<People> {
 			service.post(entity);
 			logger.info("Registro inserido");
 
-			Link link = linkTo(OrderController.class).slash(entity.getIdPeople()).withSelfRel();
+			Link link = linkTo(PeopleController.class).slash(entity.getIdPeople()).withSelfRel();
 			return new Resource<>(entity, link);
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método POST.\nMensagem: %s", e.getMessage()));

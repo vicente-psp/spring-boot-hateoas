@@ -121,7 +121,7 @@ public class OrderController implements GenericOperationsController<Order> {
 	 						MediaType.APPLICATION_XML_VALUE,
 	 						MediaTypes.HAL_JSON_VALUE})
 	@ResponseStatus(HttpStatus.OK)
-	public Resource<Order> get(@PathVariable("id") Long id) {
+	public Resource<Order> get(@PathVariable Long id) {
 		try {
 			Order entity = service.get(id);
 			logger.info(String.format("Registro recuperado: %s", entity.toString()));

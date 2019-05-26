@@ -1,35 +1,49 @@
 package com.vicente.springboothateoas.controllers;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
+import com.vicente.springboothateoas.services.impl.PeopleServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.vicente.springboothateoas.entities.People;
 import com.vicente.springboothateoas.interfaces.GenericOperationsController;
+
+import javax.validation.Valid;
 
 
 @RestController
 @RequestMapping("/peoples")
 public class PeopleController implements GenericOperationsController<People> {
-	
-	/**
-	 * @see http://appsdeveloperblog.com/spring-boot-logging-with-loggerfactory/
-	 */
+
 	Logger logger = LoggerFactory.getLogger(PeopleController.class);
 
+	@Autowired private PeopleServiceImpl service;
+
 	@Override
-	public Resource<People> post(People entity) {
-		// TODO Auto-generated method stub
+	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE },
+			produces = {MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE,
+					MediaTypes.HAL_JSON_VALUE})
+	@ResponseStatus(HttpStatus.CREATED)
+	public Resource<People> post(@RequestBody @Valid People entity) {
+		try {
+			service.post(entity);
+			logger.info("Registro inserido");
+
+			Link link = linkTo(OrderController.class).slash(entity.getIdPeople()).withSelfRel();
+			return new Resource<>(entity, link);
+		} catch (Exception e) {
+			logger.error(String.format("Erro ao executar o método POST.\nMensagem: %s", e.getMessage()));
+		}
 		return null;
 	}
 

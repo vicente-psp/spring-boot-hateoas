@@ -1,20 +1,13 @@
 package com.vicente.springboothateoas.entities;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.springframework.hateoas.ResourceSupport;
 
@@ -23,13 +16,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @Builder
-@Table(name="[order]")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order extends ResourceSupport {
+@Entity(name = "tb_order")
+public class Order extends ResourceSupport implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue (strategy = GenerationType.AUTO)
@@ -37,6 +31,10 @@ public class Order extends ResourceSupport {
 	private Long idOrder;
 
 	private UUID uuid;
+
+	@Column(name = "creation_date", updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDate;
 
 	@OneToOne (cascade=CascadeType.ALL)
 	private People people = new People();

@@ -99,7 +99,11 @@ public class PeopleController implements GenericOperationsController<People> {
 	}
 
 	@Override
-	public Resource<People> get(Long id) {
+	@GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaTypes.HAL_JSON_VALUE})
+	@ResponseStatus(HttpStatus.OK)
+	public Resource<People> get(@PathVariable Long id) {
 		try {
 			People entity = service.get(id);
 			logger.info(String.format("Registro recuperado: %s", entity.toString()));
@@ -113,10 +117,12 @@ public class PeopleController implements GenericOperationsController<People> {
 	}
 
 	@Override
+	@PatchMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void patch(People entity) {
 		try {
 			service.patch(entity);
-			logger.info(String.format("Registro atualizado: %s",entity.toString()));
+			logger.info(String.format("Registro atualizado: %s", entity.toString()));
 		} catch (Exception e) {
 			logger.error(String.format("Erro ao executar o método PATCH.\nMensagem: %s", e.getMessage()));
 		}

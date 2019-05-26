@@ -98,7 +98,11 @@ public class ProductController implements GenericOperationsController<Product> {
 	}
 
 	@Override
-	public Resource<Product> get(Long id) {
+	@GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			MediaTypes.HAL_JSON_VALUE})
+	@ResponseStatus(HttpStatus.OK)
+	public Resource<Product> get(@PathVariable Long id) {
 		try {
 			Product entity = service.get(id);
 			logger.info(String.format("Registro recuperado: %s", entity.toString()));
@@ -112,6 +116,8 @@ public class ProductController implements GenericOperationsController<Product> {
 	}
 
 	@Override
+	@PatchMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void patch(Product entity) {
 		try {
 			service.patch(entity);
